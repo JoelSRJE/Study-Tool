@@ -1,1 +1,1 @@
-"# Study-Tool" 
+Study-Tool
