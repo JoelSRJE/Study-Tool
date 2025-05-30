@@ -1,6 +1,13 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FiTrash2 } from "react-icons/fi";
 import { toast } from "react-toastify";
+import { gsap } from "gsap";
 
 export interface FlashCard {
   id: number;
@@ -12,11 +19,23 @@ export interface FlashCard {
 const FlashCardsTool = () => {
   const [flashCards, setFlashCards] = useState<FlashCard[]>([]);
   const [flashCardId, setFlashCardId] = useState<number>(1);
+  const [lastAddedCardId, setLastAddedCardId] = useState<number | null>(null);
 
   const [questionInput, setQuestionInput] = useState<string>("");
   const [answerInput, setAnswerInput] = useState<string>("");
 
   const [loadCards, setLoadCards] = useState<boolean>(true);
+
+  // GSAP Refs.
+  const cardRefs = useRef<Map<number, HTMLElement>>(new Map());
+
+  const setNewCardRef = (card: FlashCard, element: HTMLElement | null) => {
+    if (element) {
+      cardRefs.current.set(card.id, element);
+    } else {
+      cardRefs.current.delete(card.id);
+    }
+  };
 
   const getCards = () => {
     const storedCards = localStorage.getItem("FlashCards");
@@ -42,6 +61,7 @@ const FlashCardsTool = () => {
     setLoadCards(false);
   };
 
+  // Loads in cards if they exist.
   useEffect(() => {
     if (loadCards === true) {
       setTimeout(() => {
@@ -49,6 +69,55 @@ const FlashCardsTool = () => {
       }, 2000);
     }
   }, []);
+
+  // Anim for IF there are any flashcards saved. Renders them.
+  useEffect(() => {
+    if (!loadCards && flashCards.length > 0) {
+      let context = gsap.context(() => {
+        flashCards.forEach((card, idx) => {
+          const cardElement = cardRefs.current.get(card.id);
+
+          if (cardElement) {
+            gsap.fromTo(
+              cardElement,
+              { opacity: 0, y: 20 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                delay: idx * 0.1,
+                ease: "power2.out",
+              }
+            );
+          }
+        });
+      }, [cardRefs]);
+      return () => context.revert();
+    }
+  }, [loadCards]);
+
+  // Anim for a new card being added to the list.
+  useEffect(() => {
+    if (lastAddedCardId !== null) {
+      let context = gsap.context(() => {
+        setTimeout(() => {
+          const newCardElement = cardRefs.current.get(lastAddedCardId);
+
+          if (newCardElement) {
+            gsap.fromTo(
+              newCardElement,
+              { opacity: 0, scale: 0.8 },
+              { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.7)" }
+            );
+          }
+        }, 0);
+      }, [cardRefs]);
+
+      setLastAddedCardId(null);
+
+      return () => context.revert();
+    }
+  }, [lastAddedCardId]);
 
   const handleQuestionInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setQuestionInput(event.target.value);
@@ -78,6 +147,8 @@ const FlashCardsTool = () => {
 
       localStorage.setItem("FlashCards", JSON.stringify(updatedCards));
 
+      setLastAddedCardId(newFlashCard.id);
+
       toast.success("Flash Card Created!", {
         position: "bottom-right",
         autoClose: 2000,
@@ -105,16 +176,42 @@ const FlashCardsTool = () => {
   };
 
   const deleteFlashCard = (id: number) => {
-    const updatedCards = flashCards.filter((flashCard) => flashCard.id !== id);
+    const cardToDelete = cardRefs.current.get(id);
 
-    setFlashCards(updatedCards);
+    if (cardToDelete) {
+      gsap.to(cardToDelete, {
+        opacity: 0,
+        scale: 0.5,
+        duration: 0.8,
+        onComplete: () => {
+          const updatedCards = flashCards.filter(
+            (flashCard) => flashCard.id !== id
+          );
 
-    localStorage.setItem("FlashCards", JSON.stringify(updatedCards));
+          setFlashCards(updatedCards);
 
-    toast.warning("Deleted Flash Card!", {
-      position: "bottom-right",
-      autoClose: 2000,
-    });
+          localStorage.setItem("FlashCards", JSON.stringify(updatedCards));
+
+          toast.warning("Deleted Flash Card!", {
+            position: "bottom-right",
+            autoClose: 2000,
+          });
+        },
+      });
+    } else {
+      const updatedCards = flashCards.filter(
+        (flashCard) => flashCard.id !== id
+      );
+
+      setFlashCards(updatedCards);
+
+      localStorage.setItem("FlashCards", JSON.stringify(updatedCards));
+
+      toast.warning("Deleted Flash Card!", {
+        position: "bottom-right",
+        autoClose: 2000,
+      });
+    }
   };
 
   return (
@@ -163,10 +260,11 @@ const FlashCardsTool = () => {
               No Flash Cards..
             </div>
           ) : (
-            <div className="flex flex-col gap-2 mt-2 max-h-[13rem] overflow-auto">
+            <div className="flex flex-col gap-2 mt-2 max-h-[13rem] overflow-y-auto overflow-x-hidden">
               {flashCards.map((card) => (
                 <div
                   key={card.id}
+                  ref={(el) => setNewCardRef(card, el)}
                   className="relative flex justify-center perspective-1000"
                 >
                   <div>
@@ -183,7 +281,7 @@ const FlashCardsTool = () => {
                   <div>
                     {card.flipCard ? (
                       <button
-                        className={`relative flex justify-center items-center h-[4rem] max-w-[13rem] min-w-[13rem] bg-gray-600 rounded-md transition-all duration-500  ease-in-out transform-3d  hover:cursor-pointer ${
+                        className={`relative flex justify-center items-center h-[4.5rem] max-w-[13rem] min-w-[13rem] bg-gray-600 rounded-md transition-all duration-500  ease-in-out transform-3d  hover:cursor-pointer ${
                           card.flipCard ? "rotate-y-180" : ""
                         } ${flashCards.length >= 4 ? "mr-5" : ""}`}
                         onClick={() => handleToggleCard(card.id)}
@@ -201,7 +299,7 @@ const FlashCardsTool = () => {
                       </button>
                     ) : (
                       <button
-                        className={`relative flex justify-center items-center min-h-[4rem] max-w-[13rem] min-w-[13rem] bg-gray-800 rounded-md transition-all duration-500  ease-in-out transform-3d hover:cursor-pointer ${
+                        className={`relative flex justify-center items-center h-[4.5rem] max-w-[13rem] min-w-[13rem] bg-gray-800 rounded-md transition-all duration-500  ease-in-out transform-3d hover:cursor-pointer ${
                           card.flipCard ? "rotate-y-180" : ""
                         } ${flashCards.length >= 4 ? "mr-5" : ""}`}
                         onClick={() => handleToggleCard(card.id)}

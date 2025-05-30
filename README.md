@@ -1,2 +1,2 @@
 Preview image of the project.
-![PreviewImage](https://github.com/user-attachments/assets/3b0062ba-a3bb-44b8-afd5-2657ffbd5448)
+![PreviewImage](https://github.com/user-attachments/assets/6efeb0f2-7d99-4144-b685-1abbe17f714a)

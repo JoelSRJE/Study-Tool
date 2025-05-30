@@ -1,7 +1,14 @@
 "use client";
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FiTrash2 } from "react-icons/fi";
 import { toast } from "react-toastify";
+import { gsap } from "gsap";
 
 interface Task {
   id: number;
@@ -14,6 +21,18 @@ const TasksTool = () => {
   const [taskId, setTaskId] = useState<number>(1);
   const [taskInput, setTaskInput] = useState<string>("");
   const [loadTasks, setLoadTasks] = useState(true);
+  const [lastAddedTaskId, setLastAddedTaskId] = useState<number | null>(null);
+
+  // GSAP Refs.
+  const taskRefs = useRef<Map<number, HTMLElement>>(new Map());
+
+  const setNewTaskRef = (task: Task, element: HTMLElement | null) => {
+    if (element) {
+      taskRefs.current.set(task.id, element);
+    } else {
+      taskRefs.current.delete(task.id);
+    }
+  };
 
   const getTasks = () => {
     const storedTasks = localStorage.getItem("Tasks");
@@ -38,13 +57,63 @@ const TasksTool = () => {
     setLoadTasks(false);
   };
 
+  // Loads in tasks if they exist.
   useEffect(() => {
     if (loadTasks === true) {
       setTimeout(() => {
         getTasks();
       }, 2000);
     }
-  }, []);
+  }, [loadTasks]);
+
+  // Anim for IF there are any tasks saved. Renders them.
+  useEffect(() => {
+    if (!loadTasks && tasks.length > 0) {
+      let context = gsap.context(() => {
+        tasks.forEach((task, idx) => {
+          const taskElement = taskRefs.current.get(task.id);
+
+          if (taskElement) {
+            gsap.fromTo(
+              taskElement,
+              { opacity: 0, y: 20 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                delay: idx * 0.1,
+                ease: "power2.out",
+              }
+            );
+          }
+        });
+      }, [taskRefs]);
+      return () => context.revert();
+    }
+  }, [loadTasks]);
+
+  // Anim for a new task being added to the list.
+  useEffect(() => {
+    if (lastAddedTaskId !== null) {
+      let context = gsap.context(() => {
+        setTimeout(() => {
+          const newTaskElement = taskRefs.current.get(lastAddedTaskId);
+
+          if (newTaskElement) {
+            gsap.fromTo(
+              newTaskElement,
+              { opacity: 0, scale: 0.8 },
+              { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.7)" }
+            );
+          }
+        }, 0);
+      }, [taskRefs]);
+
+      setLastAddedTaskId(null);
+
+      return () => context.revert();
+    }
+  }, [lastAddedTaskId]);
 
   const addTask = (event: FormEvent) => {
     event.preventDefault();
@@ -59,6 +128,8 @@ const TasksTool = () => {
       setTaskInput("");
 
       localStorage.setItem("Tasks", JSON.stringify(updatedTasks));
+
+      setLastAddedTaskId(newTask.id);
 
       toast.success("Task created!", {
         position: "bottom-right",
@@ -98,15 +169,38 @@ const TasksTool = () => {
   };
 
   const deleteTask = (id: number) => {
-    const updatedTasks = tasks.filter((task) => task.id !== id);
+    const taskToDelete = taskRefs.current.get(id);
 
-    setTasks(updatedTasks);
+    if (taskToDelete) {
+      gsap.to(taskToDelete, {
+        opacity: 0,
+        scale: 0.5,
+        duration: 0.8,
+        onComplete: () => {
+          const updatedTasks = tasks.filter((task) => task.id !== id);
 
-    localStorage.setItem("Tasks", JSON.stringify(updatedTasks));
-    toast.success("Task deleted!", {
-      position: "bottom-right",
-      autoClose: 2000,
-    });
+          setTasks(updatedTasks);
+
+          localStorage.setItem("Tasks", JSON.stringify(updatedTasks));
+
+          toast.success("Task deleted!", {
+            position: "bottom-right",
+            autoClose: 2000,
+          });
+        },
+      });
+    } else {
+      const updatedTasks = tasks.filter((task) => task.id !== id);
+
+      setTasks(updatedTasks);
+
+      localStorage.setItem("Tasks", JSON.stringify(updatedTasks));
+
+      toast.success("Task deleted!", {
+        position: "bottom-right",
+        autoClose: 2000,
+      });
+    }
   };
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -156,11 +250,12 @@ const TasksTool = () => {
             Looks empty here..
           </div>
         ) : (
-          <div className="relative flex flex-col">
+          <div className="relative flex flex-col overflow-hidden">
             {tasks.map((task, idx) => (
               <div
                 key={idx}
-                className={`flex justify-between gap-2 p-2 group hover:bg-gray-500 ${
+                ref={(el) => setNewTaskRef(task, el)}
+                className={`flex justify-between gap-2 p-2 group opacity-0 transition-all duration-300 hover:bg-gray-500 ${
                   task.completed ? "bg-green-700" : ""
                 }`}
               >

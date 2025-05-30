@@ -150,7 +150,11 @@ const PomodoroTool = () => {
       {/* button section */}
       <div className="flex gap-4 p-2">
         <button
-          className="px-4 p-1 border-2 border-gray-600 rounded-md transition-all duration-300 hover:cursor-pointer hover:bg-[#6EE7B7] hover:border-[#6EE7B7] hover:text-black"
+          className={`px-4 p-1 border-2 rounded-md transition-all duration-300 hover:cursor-pointer hover:bg-gray-400 hover:border-gray-400 hover:text-black ${
+            isRunning
+              ? "bg-red-500 border-red-500"
+              : "bg-green-500 border-green-500"
+          }`}
           onClick={handleStartPause}
         >
           {isRunning ? "Pause" : timeLeft === 0 ? "Start" : "Start"}
