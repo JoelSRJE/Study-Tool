@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import TasksTool from "../Study Comps/Tasks/TasksTool";
 import PomodoroTool from "../Study Comps/Pomodoro/PomodoroTool";
