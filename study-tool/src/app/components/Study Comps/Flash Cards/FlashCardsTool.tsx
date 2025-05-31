@@ -281,7 +281,7 @@ const FlashCardsTool = () => {
                   <div>
                     {card.flipCard ? (
                       <button
-                        className={`relative flex justify-center items-center h-[4.5rem] max-w-[13rem] min-w-[13rem] bg-gray-600 rounded-md transition-all duration-500  ease-in-out transform-3d  hover:cursor-pointer ${
+                        className={`relative flex justify-center items-center h-[4.5rem] max-w-[13rem] min-w-[13rem] bg-gray-600 rounded-md transition-all duration-500 ease-in-out transform-3d  hover:cursor-pointer ${
                           card.flipCard ? "rotate-y-180" : ""
                         } ${flashCards.length >= 4 ? "mr-5" : ""}`}
                         onClick={() => handleToggleCard(card.id)}

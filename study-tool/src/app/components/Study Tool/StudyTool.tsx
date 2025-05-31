@@ -83,21 +83,21 @@ const StudyTool = () => {
       <div className="flex flex-col lg:flex-row gap-8 justify-center items-center ">
         <section
           ref={tasksRef}
-          className="w-full max-w-[20rem] h-[30rem] opacity-0"
+          className="w-full max-w-[20rem] h-[30rem] opacity-0 shadow-xl"
         >
           <TasksTool />
         </section>
 
         <section
           ref={pomodoroRef}
-          className="w-full max-w-[20rem] h-[30rem] opacity-0"
+          className="w-full max-w-[20rem] h-[30rem] opacity-0 shadow-xl"
         >
           <PomodoroTool />
         </section>
 
         <section
           ref={cardsRef}
-          className="w-full max-w-[20rem] h-[30rem] opacity-0"
+          className="w-full max-w-[20rem] h-[30rem] opacity-0 shadow-xl"
         >
           <FlashCardsTool />
         </section>
