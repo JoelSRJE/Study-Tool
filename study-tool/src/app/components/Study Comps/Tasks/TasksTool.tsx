@@ -242,7 +242,11 @@ const TasksTool = () => {
       </form>
 
       {/* Task list */}
-      <div className="w-full min-h-[23rem] max-h-[23rem] rounded-b-xl overflow-y-auto">
+      <div
+        className={`w-full min-h-[23rem] max-h-[23rem] rounded-b-xl ${
+          tasks.length <= 0 ? "" : "overflow-y-auto"
+        }`}
+      >
         {loadTasks ? (
           <div className="flex justify-center h-[23rem] mt-4 text-textColor font-semibold">
             Searching for stored tasks...
