@@ -13,13 +13,13 @@ export interface FlashCard {
   id: number;
   question: string;
   answer: string;
-  flipCard: boolean;
 }
 
 const FlashCardsTool = () => {
   const [flashCards, setFlashCards] = useState<FlashCard[]>([]);
   const [flashCardId, setFlashCardId] = useState<number>(1);
   const [lastAddedCardId, setLastAddedCardId] = useState<number | null>(null);
+  const [flippedCardIds, setFlippedCardIds] = useState<Set<number>>(new Set());
 
   const [questionInput, setQuestionInput] = useState<string>("");
   const [answerInput, setAnswerInput] = useState<string>("");
@@ -136,7 +136,6 @@ const FlashCardsTool = () => {
         id: flashCardId,
         question: questionInput,
         answer: answerInput,
-        flipCard: false,
       };
 
       const updatedCards = [...flashCards, newFlashCard];
@@ -164,17 +163,15 @@ const FlashCardsTool = () => {
   };
 
   const handleToggleCard = (id: number) => {
-    const updatedCards = flashCards.map((card) => {
-      if (card.id === id) {
-        return { ...card, flipCard: !card.flipCard };
+    setFlippedCardIds((prevFlippedCardIds) => {
+      const newFlippedCardIds = new Set(prevFlippedCardIds);
+      if (newFlippedCardIds.has(id)) {
+        newFlippedCardIds.delete(id);
+      } else {
+        newFlippedCardIds.add(id);
       }
-
-      return card;
+      return newFlippedCardIds;
     });
-
-    setFlashCards(updatedCards);
-
-    localStorage.setItem("FlashCards", JSON.stringify(updatedCards));
   };
 
   const deleteFlashCard = (id: number) => {
@@ -281,10 +278,10 @@ const FlashCardsTool = () => {
                     </button>
                   </div>
                   <div>
-                    {card.flipCard ? (
+                    {flippedCardIds.has(card.id) ? (
                       <button
                         className={`relative flex justify-center items-center h-[4.5rem] max-w-[13rem] min-w-[13rem] bg-gray-600 rounded-md transition-all duration-500 ease-in-out transform-3d  hover:cursor-pointer ${
-                          card.flipCard ? "rotate-y-180" : ""
+                          flippedCardIds.has(card.id) ? "rotate-y-180" : ""
                         } ${flashCards.length >= 4 ? "mr-5" : ""}`}
                         onClick={() => handleToggleCard(card.id)}
                         aria-label={`Answer Side ${card.id}`}
@@ -302,7 +299,7 @@ const FlashCardsTool = () => {
                     ) : (
                       <button
                         className={`relative flex justify-center items-center h-[4.5rem] max-w-[13rem] min-w-[13rem] bg-gray-800 rounded-md transition-all duration-500  ease-in-out transform-3d hover:cursor-pointer ${
-                          card.flipCard ? "rotate-y-180" : ""
+                          flippedCardIds.has(card.id) ? "rotate-y-180" : ""
                         } ${flashCards.length >= 4 ? "mr-5" : ""}`}
                         onClick={() => handleToggleCard(card.id)}
                         aria-label={`Question Side ${card.id}`}
