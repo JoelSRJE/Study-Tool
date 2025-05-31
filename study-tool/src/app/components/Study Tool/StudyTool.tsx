@@ -18,7 +18,7 @@ const StudyTool = () => {
     const isLargerScreen = window.matchMedia("(min-width:1024px)");
 
     // Conditionally changes anims depending on isLargerScreen variable.
-    let context = gsap.context(() => {
+    const gsapContext = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
       tl.fromTo(
@@ -68,7 +68,7 @@ const StudyTool = () => {
       }
     }, [pageTitleRef, tasksRef, pomodoroRef, cardsRef]);
 
-    return () => context.revert();
+    return () => gsapContext.revert();
   }, []);
 
   return (

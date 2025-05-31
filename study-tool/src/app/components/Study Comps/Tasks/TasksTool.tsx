@@ -48,6 +48,7 @@ const TasksTool = () => {
         );
         setTaskId(maxId + 1);
       } catch (error) {
+        console.warn("Something went wrong fetching the cards: ", error);
         toast.error("Error getting stored tasks!", {
           position: "bottom-right",
           autoClose: 2000,
@@ -69,7 +70,7 @@ const TasksTool = () => {
   // Anim for IF there are any tasks saved. Renders them.
   useEffect(() => {
     if (!loadTasks && tasks.length > 0) {
-      let context = gsap.context(() => {
+      const gsapContext = gsap.context(() => {
         tasks.forEach((task, idx) => {
           const taskElement = taskRefs.current.get(task.id);
 
@@ -88,14 +89,14 @@ const TasksTool = () => {
           }
         });
       }, [taskRefs]);
-      return () => context.revert();
+      return () => gsapContext.revert();
     }
-  }, [loadTasks]);
+  }, [loadTasks, tasks]);
 
   // Anim for a new task being added to the list.
   useEffect(() => {
     if (lastAddedTaskId !== null) {
-      let context = gsap.context(() => {
+      const gsapContext = gsap.context(() => {
         setTimeout(() => {
           const newTaskElement = taskRefs.current.get(lastAddedTaskId);
 
@@ -111,7 +112,7 @@ const TasksTool = () => {
 
       setLastAddedTaskId(null);
 
-      return () => context.revert();
+      return () => gsapContext.revert();
     }
   }, [lastAddedTaskId]);
 
@@ -136,6 +137,7 @@ const TasksTool = () => {
         autoClose: 2000,
       });
     } catch (error) {
+      console.warn("Something went wrong adding a new card: ", error);
       toast.error("Error creating task", {
         position: "bottom-right",
         autoClose: 2000,

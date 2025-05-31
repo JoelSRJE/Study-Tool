@@ -52,6 +52,7 @@ const FlashCardsTool = () => {
 
         setFlashCardId(maxId + 1);
       } catch (error) {
+        console.warn("Something went wrong fetching the cards: ", error);
         toast.error("Error Getting Flash Cards", {
           position: "bottom-right",
           autoClose: 2000,
@@ -68,12 +69,12 @@ const FlashCardsTool = () => {
         getCards();
       }, 2000);
     }
-  }, []);
+  }, [loadCards]);
 
   // Anim for IF there are any flashcards saved. Renders them.
   useEffect(() => {
     if (!loadCards && flashCards.length > 0) {
-      let context = gsap.context(() => {
+      const gsapContext = gsap.context(() => {
         flashCards.forEach((card, idx) => {
           const cardElement = cardRefs.current.get(card.id);
 
@@ -92,14 +93,14 @@ const FlashCardsTool = () => {
           }
         });
       }, [cardRefs]);
-      return () => context.revert();
+      return () => gsapContext.revert();
     }
-  }, [loadCards]);
+  }, [loadCards, flashCards]);
 
   // Anim for a new card being added to the list.
   useEffect(() => {
     if (lastAddedCardId !== null) {
-      let context = gsap.context(() => {
+      const gsapContext = gsap.context(() => {
         setTimeout(() => {
           const newCardElement = cardRefs.current.get(lastAddedCardId);
 
@@ -115,7 +116,7 @@ const FlashCardsTool = () => {
 
       setLastAddedCardId(null);
 
-      return () => context.revert();
+      return () => gsapContext.revert();
     }
   }, [lastAddedCardId]);
 
@@ -154,6 +155,7 @@ const FlashCardsTool = () => {
         autoClose: 2000,
       });
     } catch (error) {
+      console.warn("Couldn't add new card: ", error);
       toast.error("Error Creating Flash Card", {
         position: "bottom-right",
         autoClose: 2000,

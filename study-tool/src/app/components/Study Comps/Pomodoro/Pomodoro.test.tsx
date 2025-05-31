@@ -1,12 +1,4 @@
-import {
-  render,
-  screen,
-  fireEvent,
-  act,
-  findByRole,
-  getByText,
-  waitFor,
-} from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import PomodoroTool from "./PomodoroTool";
 import { toast } from "react-toastify";
 
