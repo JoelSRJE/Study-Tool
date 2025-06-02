@@ -101,8 +101,8 @@ const PomodoroTool = () => {
       <div className="flex flex-col justify-center items-center">
         <h2 className="font-semibold text-lg text-textColor mb-2">Pomodoro</h2>
 
-        <div className="flex flex-col justify-center items-center w-full">
-          <label className="text-textColor">Time:</label>
+        <label className="flex flex-col justify-center items-center w-full text-textColor">
+          Time:{" "}
           <input
             type="number"
             value={timeInput}
@@ -110,7 +110,7 @@ const PomodoroTool = () => {
             className="px-2 py-1 border-2 border-gray-700 rounded-md outline-none transition-all duration-300 group-hover:border-gray-500"
             disabled={isRunning}
           />
-        </div>
+        </label>
       </div>
 
       {/* Progress bar section*/}
@@ -152,8 +152,8 @@ const PomodoroTool = () => {
         <button
           className={`px-4 p-1 border-2 rounded-md transition-all duration-300 hover:cursor-pointer hover:bg-gray-400 hover:border-gray-400 hover:text-black ${
             isRunning
-              ? "bg-red-500 border-red-500"
-              : "bg-green-500 border-green-500"
+              ? "bg-red-700 border-red-700"
+              : "bg-green-700 border-green-700"
           }`}
           onClick={handleStartPause}
         >

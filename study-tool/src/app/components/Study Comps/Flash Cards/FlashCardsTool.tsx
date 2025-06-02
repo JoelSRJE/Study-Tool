@@ -286,13 +286,13 @@ const FlashCardsTool = () => {
                         onClick={() => handleToggleCard(card.id)}
                         aria-label={`Answer Side ${card.id}`}
                       >
-                        <span className="absolute top-0 left-1 text-gray-800 rotate-y-180">
+                        <span className="absolute top-0 left-1 text-gray-200 rotate-y-180">
                           #{card.id}
                         </span>
                         <span className="mt-3 mb-3 text-textColor font-medium text-lg tracking-wide rotate-y-180">
                           {card.answer}
                         </span>
-                        <span className="absolute -bottom-0 right-1 italic text-gray-800 text-sm rotate-y-180">
+                        <span className="absolute -bottom-0 right-1 italic text-gray-200 text-sm rotate-y-180">
                           Answer
                         </span>
                       </button>
@@ -304,13 +304,13 @@ const FlashCardsTool = () => {
                         onClick={() => handleToggleCard(card.id)}
                         aria-label={`Question Side ${card.id}`}
                       >
-                        <span className="absolute top-0 left-1 text-gray-600">
+                        <span className="absolute top-0 left-1 text-gray-400">
                           #{card.id}
                         </span>
                         <span className="mt-3 mb-3 text-textColor font-medium tracking-wide">
                           {card.question}
                         </span>
-                        <span className="absolute bottom-0 right-1 italic text-gray-600 text-sm">
+                        <span className="absolute bottom-0 right-1 italic text-gray-400 text-sm">
                           Question
                         </span>
                       </button>
