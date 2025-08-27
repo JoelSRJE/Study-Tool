@@ -3,7 +3,7 @@ export async function GET() {
   const responseData = {
     status: "Online",
     message: "Project is running",
-    timestamp: currentTime.toISOString(),
+    timestamp: currentTime.toLocaleString("sv-SE"),
   };
 
   return new Response(JSON.stringify(responseData), {
