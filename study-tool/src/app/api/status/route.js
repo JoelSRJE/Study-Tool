@@ -3,7 +3,9 @@ export async function GET() {
   const responseData = {
     status: "Online",
     message: "Project is running",
-    timestamp: currentTime.toLocaleString("sv-SE"),
+    timestamp: currentTime.toLocaleString("sv-SE", {
+      timeZone: "Europe/Stockholm",
+    }),
   };
 
   return new Response(JSON.stringify(responseData), {
