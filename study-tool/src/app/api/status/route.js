@@ -1,6 +1,7 @@
 export async function GET() {
   const currentTime = new Date();
   const responseData = {
+    project: "Study-Tool",
     status: "Online",
     message: "Project is running",
     timestamp: currentTime.toLocaleString("sv-SE", {
