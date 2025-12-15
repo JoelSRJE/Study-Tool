@@ -12,10 +12,22 @@
   --color-textColor: var(--textColor);
 }
 
+@layer utilities {
+  .bg-background {
+    background-color: var(--background);
+  }
+  .text-foreground {
+    color: var(--foreground);
+  }
+  .text-textColor {
+    color: var(--textColor);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #ededed;
-    --foreground: #0a0a0a;
+    --background: #171717;
+    --foreground: #FFFFFF;
   }
 }
 

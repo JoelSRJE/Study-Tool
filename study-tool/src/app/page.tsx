@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 
 export default function Home() {
   return (
-    <main className="flex flex-col justify-center items-center w-full min-h-full overflow-auto">
+    <main className="flex flex-col justify-center items-center w-full min-h-screen overflow-auto">
       <StudyTool />
       <ToastContainer />
     </main>
